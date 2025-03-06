@@ -1,11 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Resume</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #2d3748;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #4a5568;
+            text-align: center;
+        }
+        
+        .resume-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4F46E5;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+            width: fit-content;
+        }
+        
+        .resume-link:hover {
+            background-color: #4338CA;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(79, 70, 229, 0.3);
+        }
+        
+        .resume-icon {
+            margin-right: 8px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #718096;
+            text-align: center;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+            
+            .resume-link {
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 15px;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            p {
+                font-size: 0.9rem;
+                margin-bottom: 25px;
+            }
+            
+            .resume-link {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .footer {
+                margin-top: 30px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>My Resume</h1>
-    <p>Click below to view or download my resume:</p>
-    <a href="Praveen_Ganapathy_Ravi_Resume_intern_0305.pdf">View/Download PDF Resume</a>
+    <div class="container">
+        <h1>My Resume</h1>
+        <p>Thank you for your interest in my qualifications. Click below to view my resume.</p>
+        
+        <a href="Praveen_Ganapathy_Ravi_Resume_intern_0305.pdf" target="_blank" class="resume-link">
+            <span class="resume-icon">📄</span>View Resume
+        </a>
+        
+        <div class="footer">
+            Updated March 2025
+        </div>
+    </div>
 </body>
 </html>
