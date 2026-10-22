@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Resume — Alex Carter</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#525659;color:#222;font-family:Arial,sans-serif}.page{max-width:816px;min-height:1056px;margin:24px auto;background:white;padding:56px 64px;box-shadow:0 2px 14px #0006}header{border-bottom:2px solid #333;padding-bottom:16px}h1{font-size:30px;margin:0}.title,.contact{color:#555}p,li{font-size:14px;line-height:1.6}h2{font-size:16px;text-transform:uppercase;border-bottom:1px solid #ccc;padding-bottom:5px;margin-top:26px}.consent{background:#eef3fb;border:1px solid #cdd7ef;padding:16px;margin:24px 0;border-radius:6px}button{background:#1a73e8;color:white;border:0;border-radius:5px;padding:12px 18px;cursor:pointer}button:disabled{opacity:.65;cursor:default}.secondary{background:#666}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:#f4f4f4;padding:12px}.row{display:flex;justify-content:space-between;gap:16px;font-size:14px}footer{font-size:12px;color:#666;margin-top:30px}@media(max-width:650px){.page{margin:0;padding:25px}.row{display:block}}@media print{body{background:white}.page{margin:0;box-shadow:none}.consent,#details,footer{display:none}}
+</style></head><body><main class="page">
+<header><h1>Alex Carter</h1><p class="title">Software Engineer</p><p class="contact">alex.carter@example.com · (555) 010-2048 · Detroit, MI · github.com/example</p></header>
+<section class="consent" id="consentbox"><h2>Optional browser-info demo</h2><p>The résumé is available without participating. Selecting “I Accept” collects and sends your browser/device details, canvas and audio fingerprints, GPU, screen, timezone, language, media-device counts, User-Agent and network addresses to this site's Supabase database. The network probe contacts Google's public STUN service. Some details may be unavailable or masked. No camera or microphone recording is requested.</p><p>Only participate if you agree to this collection. No fingerprint collection or submission runs before acceptance. Contact the page owner with your reference token to request deletion. Data retention must be configured by the page owner.</p><button id="reveal" type="button">I Accept — collect and save</button> <button id="decline" class="secondary" type="button">No thanks</button><p id="status" role="status" aria-live="polite"></p></section>
+<section id="details" hidden><h2>Browser details</h2><pre id="data"></pre></section>
+<h2>Summary</h2><p>Backend-leaning full-stack engineer with 6 years building web services and internal tools. Comfortable across Node, Python, and PostgreSQL.</p>
+<h2>Experience</h2><div class="row"><strong>Senior Software Engineer — Northbridge Systems</strong><span>2021 – Present</span></div><ul><li>Led a 4-person team rebuilding the billing API, cutting p95 latency 40%.</li><li>Introduced CI quality gates that dropped production incidents by a third.</li></ul><div class="row"><strong>Software Engineer — Lakeside Apps</strong><span>2018 – 2021</span></div><ul><li>Shipped the customer dashboard used by 20k monthly users.</li><li>Migrated a legacy PHP service to Node with zero downtime.</li></ul>
+<h2>Education</h2><p>B.S. Computer Science — State University, 2018</p><h2>Skills</h2><p>JavaScript / TypeScript · Node.js · Python · PostgreSQL · Docker · AWS</p><footer>Demo résumé webpage — not a PDF. Résumé content is sample content.</footer></main>
+<script>
+'use strict';
+const LOG_ENDPOINT = 'https://cnvnygkdvfvlzrlumxgg.supabase.co/functions/v1/log-visit';
+
+const CONSENT_VERSION = 'resume-demo-v1';
+const safe=(d,k,fn)=>{try{d[k]=fn()??null}catch{d[k]=null}};
+const timeout=(promise,ms)=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timed out')),ms))]);
+async function audioFp(){
+ const Ctx=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+ if(!Ctx)return null;
+ const ctx=new Ctx(1,5000,44100),osc=ctx.createOscillator(),comp=ctx.createDynamicsCompressor();
+ osc.type='triangle';osc.frequency.value=10000;osc.connect(comp);comp.connect(ctx.destination);osc.start(0);
+ const buffer=await timeout(ctx.startRendering(),2500);
+ let sum=0;for(const x of buffer.getChannelData(0))sum+=Math.abs(x);
+ return sum.toString().slice(0,16);
+}
+function rtcIPs(){return new Promise(resolve=>{
+ const addresses=new Set();let pc,timer,finished=false;
+ const finish=()=>{if(finished)return;finished=true;clearTimeout(timer);try{pc?.close()}catch{}resolve([...addresses])};
+ try{pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});pc.createDataChannel('demo');
+ pc.onicecandidate=e=>{if(!e.candidate){finish();return}const address=e.candidate.address||e.candidate.candidate.split(' ')[4];if(address)addresses.add(address)};
+ timer=setTimeout(finish,2000);pc.createOffer().then(o=>pc.setLocalDescription(o)).catch(finish);
+ }catch{finish()}
+})}
+async function collect(){
+ const d={};
+ safe(d,'screen',()=>({w:screen.width,h:screen.height,availW:screen.availWidth,availH:screen.availHeight,colorDepth:screen.colorDepth}));
+ safe(d,'viewport',()=>({w:innerWidth,h:innerHeight}));safe(d,'dpr',()=>devicePixelRatio);
+ safe(d,'tz',()=>Intl.DateTimeFormat().resolvedOptions().timeZone);safe(d,'locale',()=>navigator.language);
+ safe(d,'languages',()=>Array.from(navigator.languages));safe(d,'platform',()=>navigator.platform);
+ safe(d,'cores',()=>navigator.hardwareConcurrency);safe(d,'memory',()=>navigator.deviceMemory);
+ safe(d,'touchPoints',()=>navigator.maxTouchPoints);safe(d,'cookieEnabled',()=>navigator.cookieEnabled);
+ safe(d,'canvas',()=>{const c=document.createElement('canvas');c.width=240;c.height=60;const x=c.getContext('2d');x.textBaseline='top';x.font='14px Arial';x.fillStyle='#f60';x.fillRect(0,0,100,20);x.fillStyle='#069';x.fillText('demo-fingerprint-\u{1F600}',2,2);return c.toDataURL()});
+ safe(d,'webgl',()=>{const gl=document.createElement('canvas').getContext('webgl');if(!gl)return null;try{const ext=gl.getExtension('WEBGL_debug_renderer_info');return ext?{vendor:gl.getParameter(ext.UNMASKED_VENDOR_WEBGL),renderer:gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)}:null}finally{gl.getExtension('WEBGL_lose_context')?.loseContext()}});
+ await Promise.all([
+ (async()=>{try{d.uaCH=navigator.userAgentData?await timeout(navigator.userAgentData.getHighEntropyValues(['platform','platformVersion','architecture','model','uaFullVersion','bitness']),3000):null}catch{d.uaCH=null}})(),
+ (async()=>{try{const devices=await timeout(navigator.mediaDevices.enumerateDevices(),3000);d.mediaDevices=devices.reduce((a,x)=>(a[x.kind]=(a[x.kind]||0)+1,a),{})}catch{d.mediaDevices=null}})(),
+ audioFp().then(v=>d.audio=v).catch(()=>d.audio=null),rtcIPs().then(v=>d.rtcIPs=v)
+ ]);return d;
+}
+let pending=null;
+const btn=document.getElementById('reveal'),status=document.getElementById('status');
+document.getElementById('decline').onclick=()=>{document.getElementById('consentbox').hidden=true};
+btn.onclick=async()=>{
+ if(LOG_ENDPOINT.includes('YOUR-PROJECT-REF')){status.textContent='The page owner must configure the Supabase endpoint first.';return}
+ btn.disabled=true;document.getElementById('decline').disabled=true;
+ try{
+ if(!pending){btn.textContent='Collecting…';const client=await collect();pending={token:crypto.randomUUID(),consent:true,consent_version:CONSENT_VERSION,client_at:new Date().toISOString(),client};document.getElementById('data').textContent=JSON.stringify(client,null,2);document.getElementById('details').hidden=false}
+ btn.textContent='Saving…';const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);let response;
+ try{response=await fetch(LOG_ENDPOINT,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(pending),signal:controller.signal})}finally{clearTimeout(timer)}
+ const result=await response.json().catch(()=>({}));if(!response.ok||result.ok!==true)throw new Error('Save was not confirmed.');
+ btn.textContent='Recorded';status.textContent='Saved. Reference token: '+result.token+'. Keep it if you want to request deletion.';
+ }catch(error){btn.disabled=false;btn.textContent='Retry saving';status.textContent='Save was not confirmed. Retry uses the same submission token to avoid duplicate rows.';console.error(error)}
+};
+</script></body></html>
